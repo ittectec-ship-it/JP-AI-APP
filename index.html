@@ -2,99 +2,36 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JP AI + Nano Banana</title>
+<title>JP AI</title>
 <style>
 body{font-family:sans-serif;background:#111;color:white;text-align:center;padding:15px;margin:0}
-h1{font-size:28px} .tabs{display:flex;gap:10px;justify-content:center;margin:15px 0}
-.tab{padding:12px 20px;border-radius:20px;background:#333;color:white;border:none;font-size:16px}
-.tab.active{background:#FFD700;color:black;font-weight:bold}
+h1{font-size:28px}
 .card{background:#222;padding:15px;border-radius:15px;margin:10px 0;text-align:left}
-input,textarea{width:100%;padding:12px;border-radius:10px;border:none;margin:8px 0;font-size:16px;box-sizing:border-box}
+textarea{width:100%;padding:12px;border-radius:10px;border:none;margin:8px 0;font-size:16px;box-sizing:border-box}
 button{width:100%;padding:14px;border:none;border-radius:12px;background:#FFD700;font-weight:bold;font-size:17px}
-#resultImg{width:100%;border-radius:15px;margin-top:10px;display:none}
 .msg{background:#333;padding:10px;border-radius:10px;margin:8px 0;text-align:left}
 small{color:#aaa}
 </style>
 </head>
 <body>
-<h1>JP AI 🤖🍌</h1>
-<p>Chat + Nano Banana Pictures</p>
+<h1>JP AI 🤖</h1>
+<p>Chat with JP</p>
 
-<div class="tabs">
-<button class="tab active" id="tabChat" onclick="showTab('chat')">💬 Chat</button>
-<button class="tab" id="tabBanana" onclick="showTab('banana')">🍌 Nano Banana</button>
-</div>
-
-<div id="chatPage">
-<div class="card"><b>JP AI Chat</b><div id="chatBox"><div class="msg">Hi! I'm JP! Ask me anything 👇</div></div>
-<textarea id="chatInput" placeholder="Ask JP anything..."></textarea>
-<button onclick="askJP()">Send to JP</button></div>
-</div>
-
-<div id="bananaPage" style="display:none">
 <div class="card">
-<b>🍌 Nano Banana - Make Any Picture</b><br><small>Powered by Google Gemini Nano Banana</small><br><br>
-<label>Your Gemini API Key (saved only on your phone):</label>
-<input id="apiKey" type="password" placeholder="Paste AIza... key here" onchange="localStorage.setItem('jp_key',this.value)">
-<small>Get free key at: aistudio.google.com → Get API Key</small><br><br>
-<label>What picture do you want?</label>
-<textarea id="imgPrompt" placeholder="Example: A cute banana wearing sunglasses on the beach, cartoon style"></textarea>
-<button onclick="makeImage()">🍌 Generate Picture</button>
-<p id="status"></p>
-<img id="resultImg">
-<button id="dlBtn" style="display:none;background:#fff;margin-top:10px" onclick="downloadImg()">⬇️ Download Picture</button>
-</div>
-<div class="card"><b>Try these:</b><br>
-<button style="background:#333;color:white;margin:5px 0" onclick="setPrompt('A funny banana superhero flying over Cape Town')">🦸 Banana Superhero</button>
-<button style="background:#333;color:white;margin:5px 0" onclick="setPrompt('A cute banana DJ at a party, neon lights')">🎧 Banana DJ</button>
-<button style="background:#333;color:white;margin:5px 0" onclick="setPrompt('A banana astronaut on the moon')">🚀 Banana Astronaut</button>
-</div>
+<b>JP AI Chat</b>
+<div id="chatBox"><div class="msg">Hi! I'm JP! Ask me anything 👇</div></div>
+<textarea id="chatInput" placeholder="Ask JP anything..."></textarea>
+<button onclick="askJP()">Send to JP</button>
 </div>
 
 <script>
-document.getElementById('apiKey').value = localStorage.getItem('jp_key')||'';
-function showTab(t){
-  document.getElementById('chatPage').style.display = t==='chat'?'block':'none';
-  document.getElementById('bananaPage').style.display = t==='banana'?'block':'none';
-  document.getElementById('tabChat').classList.toggle('active',t==='chat');
-  document.getElementById('tabBanana').classList.toggle('active',t==='banana');
-}
-function setPrompt(p){document.getElementById('imgPrompt').value=p; window.scrollTo(0,0);}
 function askJP(){
-  let q=document.getElementById('chatInput').value; if(!q) return;
+  let q=document.getElementById('chatInput').value;
+  if(!q) return;
   let box=document.getElementById('chatBox');
   box.innerHTML+='<div class="msg"><b>You:</b> '+q+'</div>';
-  box.innerHTML+='<div class="msg"><b>JP:</b> Cool question! I am JP AI - and now I can also make pictures! Go to the 🍌 Nano Banana tab and try me! For chat, tell me what you want to build next.</div>';
+  box.innerHTML+='<div class="msg"><b>JP:</b> Cool question! I am JP AI - tell me what you want to build next and I will help you.</div>';
   document.getElementById('chatInput').value='';
-}
-async function makeImage(){
-  let key=document.getElementById('apiKey').value.trim();
-  let prompt=document.getElementById('imgPrompt').value.trim();
-  if(!key){alert('Paste your Gemini API Key first! Get it free at aistudio.google.com'); return;}
-  if(!prompt){alert('Type what picture you want!'); return;}
-  localStorage.setItem('jp_key',key);
-  document.getElementById('status').innerText='🍌 Nano Banana is drawing... wait 10 seconds...';
-  document.getElementById('resultImg').style.display='none';
-  try{
-    let res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key='+key,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
-    });
-    let data=await res.json();
-    let parts=data.candidates[0].content.parts;
-    for(let p of parts){ if(p.inlineData){
-      let img=document.getElementById('resultImg');
-      img.src='data:'+p.inlineData.mimeType+';base64,'+p.inlineData.data;
-      img.style.display='block';
-      document.getElementById('dlBtn').style.display='block';
-      document.getElementById('status').innerText='Done! 🍌🔥';
-      return;
-    }}
-    document.getElementById('status').innerText='No picture returned. Try another prompt.';
-  }catch(e){ document.getElementById('status').innerText='Error: '+e.message+' - Check your API key.'; }
-}
-function downloadImg(){
-  let a=document.createElement('a'); a.href=document.getElementById('resultImg').src; a.download='nano-banana.png'; a.click();
 }
 </script>
 </body>
