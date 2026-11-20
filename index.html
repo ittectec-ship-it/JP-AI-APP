@@ -1,51 +1,162 @@
-<      .msg-badge svg { width: 10px; height: 10px; fill: #ffffff; }
-  .msg img { width: 100%; border-radius: 8px; margin-top: 8px; display: block; border: 1px solid var(--border); }
-  .msgActions {
-    display: flex; gap: 6px; flex-wrap: wrap;
-    margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--border);
-  }
-  .msg .dl {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: var(--accent); color: #ffffff;
-    padding: 6px 12px; border-radius: 6px;
-    font-weight: 600; font-size: 12px; text-decoration: none; border: 0; cursor: pointer;
-  }
-  .msg .dl svg { width: 13px; height: 13px; fill: #ffffff; }
-  .msg .cp {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: #ffffff; color: var(--text);
-    border: 1px solid var(--border); padding: 6px 11px;
-    border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer;
-  }
-  .bottom-dock { background: #ffffff; border-top: 1px solid var(--border); padding-top: 8px; flex-shrink: 0; }
-  .quick-actions { display: flex; gap: 6px; padding: 0 12px 7px; }
-  .quick-actions button {
-    flex: 1; background: #ffffff; color: var(--accent);
-    border: 1px solid var(--border); border-radius: 16px;
-    padding: 5px 8px; font-size: 11.5px; font-weight: 600;
-    cursor: pointer; white-space: nowrap;
-  }
-  .quick-actions button:hover { background: var(--accent-soft); border-color: var(--accent); }
-  .modes { display: flex; gap: 6px; padding: 0 12px; }
-  .modes button {
-    flex: 1; padding: 7px 10px; border-radius: 6px;
-    border: 1px solid var(--border); background: #ffffff;
-    color: var(--text-muted); font-weight: 600; font-size: 12px;
-    cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  }
-  .modes button svg { width: 14px; height: 14px; fill: var(--text-muted); }
-  .modes button.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
-  .modes button.active svg { fill: var(--accent); }
-  .input { display: flex; gap: 8px; padding: 8px 12px; background: #ffffff; }
-  .input input {
-    flex: 1; padding: 10px 12px; border-radius: 6px;
-    border: 1px solid var(--border); background: #ffffff; color: var(--text);
-    font-size: 13.5px; font-family: inherit;
-  }
-  .input input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
-  .input button {
-    background: var(--accent); border: 0; padding: 10px 15px;
-    border-radius: 6px; font-weight: 600; color: #fff;
-    cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 5px;
-  }
-  .input button svg { width: 15px; height: 15px; fill: #ffffff; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JP PILOT</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<style>
+:root{--accent:#185abd;--accent-hover:#104593;--accent-soft:#ebf3fc;--bg:#fff;--text:#242424;--text-muted:#605e5c;--border:#e6e6e6;--shadow:0 2px 8px rgba(0,0,0,0.05)}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",sans-serif;background:#fff;color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.top{background:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.menu-btn{background:#fff;color:var(--text);border:1px solid transparent;padding:6px 9px;border-radius:6px;font-size:17px;cursor:pointer}
+.brand{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;cursor:pointer}
+.brand b{font-size:16px;font-weight:700}
+.hostTag{font-size:11px;background:var(--accent-soft);color:var(--accent);padding:3px 9px;border-radius:12px;font-weight:600}
+.sidebar{position:fixed;top:0;left:-290px;width:270px;height:100%;background:#fff;z-index:99;transition:0.25s ease;padding:14px;display:flex;flex-direction:column;border-right:1px solid var(--border)}
+.sidebar.open{left:0}
+.sidebar-head{font-size:18px;font-weight:700;margin-bottom:14px}
+.search{display:flex;gap:6px;margin-bottom:10px}
+.search input{flex:1;padding:8px 10px;border-radius:6px;border:1px solid var(--border)}
+.newchat{background:var(--accent);border:0;color:#fff;padding:10px;border-radius:6px;font-weight:600;cursor:pointer}
+.list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+.chatItem{padding:9px 10px;border-radius:6px;font-size:13px;display:flex;justify-content:space-between;cursor:pointer}
+.chatItem.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.25);display:none;z-index:90}
+.overlay.show{display:block}
+#chat{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:12px;background:#fff}
+.msg{max-width:92%;padding:12px 14px;border-radius:10px;background:#fff;color:var(--text);white-space:pre-wrap;border:1px solid var(--border);font-size:13.5px;line-height:1.5}
+.msg.user{background:var(--accent);color:#fff;margin-left:auto;border-color:var(--accent)}
+.msg-head{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:11px;font-weight:600;color:var(--text-muted)}
+.msg.user .msg-head{color:rgba(255,255,255,0.85)}
+.msg img{width:100%;border-radius:8px;margin-top:8px;display:block;border:1px solid var(--border)}
+.msgActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:9px;border-top:1px solid var(--border)}
+.msg .dl{display:inline-flex;align-items:center;gap:5px;background:var(--accent);color:#fff;padding:6px 12px;border-radius:6px;font-weight:600;font-size:12px;border:0;cursor:pointer}
+.msg .cp{display:inline-flex;align-items:center;gap:4px;background:#fff;color:var(--text);border:1px solid var(--border);padding:6px 11px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer}
+.bottom-dock{background:#fff;border-top:1px solid var(--border);padding-top:8px;flex-shrink:0}
+.quick-actions{display:flex;gap:6px;padding:0 12px 7px}
+.quick-actions button{flex:1;background:#fff;color:var(--accent);border:1px solid var(--border);border-radius:16px;padding:5px 8px;font-size:11.5px;font-weight:600;cursor:pointer}
+.modes{display:flex;gap:6px;padding:0 12px}
+.modes button{flex:1;padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--text-muted);font-weight:600;font-size:12px;cursor:pointer}
+.modes button.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.input{display:flex;gap:8px;padding:8px 12px;background:#fff}
+.input input{flex:1;padding:10px 12px;border-radius:6px;border:1px solid var(--border);font-size:13.5px}
+.input input:focus{outline:none;border-color:var(--accent)}
+.input button{background:var(--accent);border:0;padding:10px 15px;border-radius:6px;font-weight:600;color:#fff;cursor:pointer;font-size:13px}
+#status{margin:8px 12px;padding:8px;border-radius:6px;display:none;font-size:12px;text-align:center}
+#confirmBar{display:none;background:#fef3c7;border:1px solid #f59e0b;padding:10px;border-radius:10px;margin:8px 12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="top">
+<button class="menu-btn" onclick="toggleSidebar()">☰</button>
+<div class="brand" onclick="openArena()"><b>JP PILOT</b><span class="hostTag">AI</span></div>
+</div>
+<div class="sidebar" id="sidebar">
+<div class="sidebar-head">Chats</div>
+<div class="search"><input id="searchInput" placeholder="Search chats..."><button onclick="doSearch()">🔍</button></div>
+<button class="newchat" onclick="newChat()">+ New Chat</button>
+<div class="list" id="chatList"></div>
+<button class="newchat" style="background:#fff;color:var(--accent);border:1px solid var(--border);margin-top:8px" onclick="openArena()">Open Arena AI →</button>
+</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<div id="chat"></div>
+<div id="confirmBar">
+<p style="margin:0 0 8px;font-size:13px">Insert this text into your Word document?</p>
+<button onclick="confirmInsert(true)" style="background:var(--accent);color:#fff;padding:8px 14px;border-radius:6px;border:0;font-weight:600">Yes, Insert</button>
+<button onclick="confirmInsert(false)" style="background:#fff;border:1px solid var(--border);padding:8px 14px;border-radius:6px;margin-left:6px">Cancel</button>
+</div>
+<div id="status"></div>
+<div class="bottom-dock">
+<div class="quick-actions">
+<button onclick="askToInsert()">✨ Ask to Insert</button>
+<button onclick="autoPasteFromClipboard()">⚡ Auto-Paste</button>
+</div>
+<div class="modes">
+<button id="mode-ask" class="active" onclick="setMode('ask')">Ask</button>
+<button id="mode-write" onclick="setMode('write')">Write</button>
+</div>
+<div class="input">
+<input id="userInput" placeholder="Type message or paste Arena AI text..." onkeypress="if(event.key==='Enter') sendMessage()">
+<button onclick="sendMessage()">Send</button>
+</div>
+</div>
+<script>
+let pendingText=""; let currentMode='ask';
+Office.onReady(()=>{ loadChats(); });
+
+function toggleSidebar(){
+ document.getElementById('sidebar').classList.toggle('open');
+ document.getElementById('overlay').classList.toggle('show');
+}
+function openArena(){
+ const url="https://arena.ai/agent";
+ if(Office && Office.context && Office.context.ui && Office.context.ui.openBrowserWindow){
+   Office.context.ui.openBrowserWindow(url);
+ }else{ window.open(url,"_blank"); }
+}
+function showStatus(msg,type){
+ const el=document.getElementById('status'); el.textContent=msg; el.style.display='block';
+ el.style.background=type=='error'?'#fee2e2':type=='success'?'#dcfce7':'#e0f2fe';
+ setTimeout(()=>{ el.style.display='none'; },3000);
+}
+async function writeToWord(text){
+ try{
+  await Word.run(async (context)=>{
+   context.document.getSelection().insertText(text, Word.InsertLocation.replace);
+   await context.sync();
+  });
+  showStatus("Inserted into Word!","success");
+ }catch(err){ showStatus("Word error: "+err.message,"error"); }
+}
+function addMessage(text,isUser){
+ const chat=document.getElementById('chat');
+ const div=document.createElement('div');
+ div.className=isUser?'msg user':'msg';
+ div.innerHTML='<div class="msg-head">'+(isUser?'You':'JP PILOT')+'</div>'+escapeHtml(text)+
+ '<div class="msgActions"><button class="cp" onclick="copyText(this)">Copy</button><button class="dl" onclick="insertFromMsg(this)">Insert to Word</button></div>';
+ chat.appendChild(div); chat.scrollTop=chat.scrollHeight;
+}
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function copyText(btn){
+ const text=btn.parentElement.parentElement.innerText.replace('CopyInsert to Word','').replace('You','').replace('JP PILOT','').trim();
+ navigator.clipboard.writeText(text).then(()=>showStatus("Copied!","success"));
+}
+function insertFromMsg(btn){
+ const text=btn.parentElement.parentElement.innerText.replace('CopyInsert to Word','').replace('You','').replace('JP PILOT','').trim();
+ writeToWord(text);
+}
+function sendMessage(){
+ const input=document.getElementById('userInput'); const text=input.value.trim(); if(!text) return;
+ addMessage(text,true); input.value='';
+ // If it looks like Arena AI answer, auto-offer to insert
+ if(text.length>20){ pendingText=text; document.getElementById('confirmBar').style.display='block'; }
+ saveChat(text);
+}
+function insertDirect(){ sendMessage(); writeToWord(document.getElementById('userInput').value || pendingText); }
+function askToInsert(){
+ const text=document.getElementById('userInput').value.trim();
+ if(!text) return showStatus("Type or paste Arena text first.","error");
+ pendingText=text; document.getElementById('confirmBar').style.display='block';
+}
+function confirmInsert(approved){
+ document.getElementById('confirmBar').style.display='none';
+ if(approved && pendingText) writeToWord(pendingText); pendingText="";
+}
+async function autoPasteFromClipboard(){
+ try{
+  const clipText=await navigator.clipboard.readText();
+  if(!clipText.trim()) return showStatus("Clipboard empty.","error");
+  document.getElementById('userInput').value=clipText; addMessage(clipText,false); pendingText=clipText;
+  document.getElementById('confirmBar').style.display='block';
+ }catch(err){ showStatus("Paste manually - clipboard blocked.","error"); }
+}
+function setMode(m){ currentMode=m; document.querySelectorAll('.modes button').forEach(b=>b.classList.remove('active')); document.getElementById('mode-'+m).classList.add('active'); }
+function newChat(){ document.getElementById('chat').innerHTML=''; showStatus("New chat started","success"); }
+function loadChats(){ /* load from localStorage if you have */ }
+function saveChat(t){ /* save logic */ }
+function doSearch(){ showStatus("Search coming soon","success"); }
+</script>
+</body>
+</html>
